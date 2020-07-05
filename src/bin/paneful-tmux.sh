@@ -15,3 +15,4 @@ tmux new-session \; \
 	split-window -v -p 66 \; \
 	split-window -v -p 50 \; \
 	select-pane -t 0 \; \
+	send-keys "vim -c 'Texplore'" C-m
