@@ -8,7 +8,10 @@
 # set pane-border-status top \; \
 # select-pane -T 'Editor' \; \
 
+session_name=${PWD##*/}
+
 tmux new-session \; \
+	rename-session "$session_name" \; \
 	split-window -v -p 10 \; \
 	select-pane -t 0 \; \
 	split-window -h -p 50 \; \
