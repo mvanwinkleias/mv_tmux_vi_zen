@@ -8,6 +8,10 @@
 # set pane-border-status top \; \
 # select-pane -T 'Editor' \; \
 
+# Allow us to use GPG in it:
+export GPG_TTY=$(tty)
+gpg-connect-agent updatestartuptty /bye >/dev/null
+
 session_name=${PWD##*/}
 session_name="${session_name}-"$(date '+%Y_%m_%d_%H_%M_%S')
 tmux new-session \; \
