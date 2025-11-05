@@ -12,7 +12,15 @@
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
 
-session_base_name="~${PWD##*/}~"
+b64_path=$( \
+	printf "%s" "$(pwd) " \
+	| openssl sha256 -binary \
+	| base64 \
+	| sed 's/\//_/g' \
+) 
+
+b64_path="${b64_path:0:5}"
+session_base_name="~$b64_path~${PWD##*/}~"
 session_base_name="${session_base_name//./﹒}"
 session_base_name="${session_base_name//:/։}"
 
