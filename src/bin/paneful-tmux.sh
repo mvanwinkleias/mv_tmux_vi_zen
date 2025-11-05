@@ -12,16 +12,39 @@
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
 
-session_name=${PWD##*/}
-session_name="${session_name}-"$(date '+%Y_%m_%d_%H_%M_%S')
-session_name="${session_name//./-}"
-session_name="${session_name//:/-}"
+session_base_name="~${PWD##*/}~"
+session_base_name="${session_base_name//./﹒}"
+session_base_name="${session_base_name//:/։}"
 
-tmux new-session \; \
-	rename-session "$session_name" \; \
-	split-window -v -p 10 \; \
-	select-pane -t 0 \; \
-	split-window -h -p 50 \; \
-	split-window -v -p 66 \; \
-	split-window -v -p 50 \; \
-	select-pane -t 0 \; 
+printf "Looking for: %s\n" "$session_base_name"
+found_session=$(\
+	tmux list-sessions -F '#S' \
+	| grep "$session_base_name" \
+
+)
+
+result="$?"
+
+printf "Found session: %s\n" "$found_session";
+printf "Result: $result\n";
+
+# exit 1
+
+if [[ "$result" == 0 ]]
+then
+	printf "Here\n"
+	tmux attach-session -t "$found_session:0"
+else
+
+	session_name="$session_base_name"$(date '+%Y_%m_%d_%H_%M_%S')
+
+
+	tmux new-session \; \
+		rename-session "$session_name" \; \
+		split-window -v -p 10 \; \
+		select-pane -t 0 \; \
+		split-window -h -p 50 \; \
+		split-window -v -p 66 \; \
+		split-window -v -p 50 \; \
+		select-pane -t 0 \; 
+fi
