@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# One long, thin pane at the bottom (for builds)
+# One long, thin pane at the bottom
 # A tall pane at the left (for editing)
 # 3 panes on the right for agility
 
@@ -12,8 +12,10 @@
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
 
+rp="$(realpath $(pwd) )"
+
 b64_path=$( \
-	printf "%s" "$(pwd) " \
+	printf "%s" "$rp" \
 	| openssl sha256 -binary \
 	| base64 \
 	| sed 's/\//_/g' \
@@ -24,7 +26,7 @@ session_base_name="~$b64_path~${PWD##*/}~"
 session_base_name="${session_base_name//./﹒}"
 session_base_name="${session_base_name//:/։}"
 
-printf "Looking for: %s\n" "$session_base_name"
+printf "Session base name: %s\n" "$session_base_name"
 found_session=$(\
 	tmux list-sessions -F '#S' \
 	| grep "$session_base_name" \
@@ -33,20 +35,16 @@ found_session=$(\
 
 result="$?"
 
-printf "Found session: %s\n" "$found_session";
-printf "Result: $result\n";
-
 # exit 1
 
 if [[ "$result" == 0 ]]
 then
-	printf "Here\n"
+	printf "Found session: $found_session\n"
 	tmux attach-session -t "$found_session:0"
 else
+	session_name="$session_base_name"$(date '+%Y%m%d%H%M%S')
 
-	session_name="$session_base_name"$(date '+%Y_%m_%d_%H_%M_%S')
-
-
+	printf "Making new session: %s\n" "$session_name"
 	tmux new-session \; \
 		rename-session "$session_name" \; \
 		split-window -v -p 10 \; \
