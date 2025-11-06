@@ -8,10 +8,18 @@
 #
 # If a session already matches that name then it will attach to that session.
 #
+# Created sessions start off with panes that I typically use when programming.
+#
+# Valid session names can not contain dots "." or colons ":", so if they exist
+# in the current directory name then they are replaced by some unicode
+# equivalent.
+#
 # ## Rationale
 # 
 # The full path to a project can be quite long.  So, it's hashed into a sha256,
-# and then base64'd.
+# and then base64'd.  The chances of a collision are 64^5 (5 characters are
+# currently used).  It uses openssl to generate the hash.
+
 
 # Allow us to use GPG in it:
 export GPG_TTY=$(tty)
