@@ -1,12 +1,17 @@
 #!/bin/bash
 
-# One long, thin pane at the bottom
-# A tall pane at the left (for editing)
-# 3 panes on the right for agility
-
-# Scratch:
-# set pane-border-status top \; \
-# select-pane -T 'Editor' \; \
+# paneful-tmux.sh
+# 	For any given path, create a unique tmux session named thus:
+# 		<part of the b64 hash of realpath>~<dirname of path>
+# 	i.e.
+# 		X4hf7~some_project
+#
+# If a session already matches that name then it will attach to that session.
+#
+# ## Rationale
+# 
+# The full path to a project can be quite long.  So, it's hashed into a sha256,
+# and then base64'd.
 
 # Allow us to use GPG in it:
 export GPG_TTY=$(tty)
@@ -22,7 +27,7 @@ b64_path=$( \
 ) 
 
 b64_path="${b64_path:0:5}"
-session_base_name="~$b64_path~${PWD##*/}~"
+session_base_name="$b64_path~${PWD##*/}"
 session_base_name="${session_base_name//./﹒}"
 session_base_name="${session_base_name//:/։}"
 
@@ -57,7 +62,7 @@ then
 	printf "Found session: $found_sessions\n"
 	tmux attach-session -t "$found_sessions:0"
 else
-	session_name="$session_base_name"$(date '+%Y%m%d%H%M%S')
+	session_name="$session_base_name"
 
 	printf "Making new session: %s\n" "$session_name"
 	tmux new-session \; \
