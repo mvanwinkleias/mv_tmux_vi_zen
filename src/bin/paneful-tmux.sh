@@ -27,7 +27,7 @@ session_base_name="${session_base_name//./﹒}"
 session_base_name="${session_base_name//:/։}"
 
 printf "Session base name: %s\n" "$session_base_name"
-found_session=$(\
+found_sessions=$(\
 	tmux list-sessions -F '#S' \
 	| grep "$session_base_name" \
 
@@ -37,10 +37,25 @@ result="$?"
 
 # exit 1
 
+
+# found_sessions="session 1
+# session 2"
+
+# printf "Found sessions: %s\n" "$found_sessions"
+
+session_count=$( printf "%s\n" "$found_sessions" | wc -l)
+if [[ "$session_count" -gt 1 ]]
+then
+	>&2 printf "More than one session found matching base session name.\n"
+	>&2 printf "Please use tmux directly.\n"
+	>&2 printf "%s\n" "$found_sessions"
+	exit 1
+fi
+
 if [[ "$result" == 0 ]]
 then
-	printf "Found session: $found_session\n"
-	tmux attach-session -t "$found_session:0"
+	printf "Found session: $found_sessions\n"
+	tmux attach-session -t "$found_sessions:0"
 else
 	session_name="$session_base_name"$(date '+%Y%m%d%H%M%S')
 
